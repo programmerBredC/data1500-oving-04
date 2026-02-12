@@ -48,35 +48,41 @@ erDiagram
 ```mermaid
 erDiagram
 BRUKER {
-    string brukernavn
+    int bruker_id(pk)
+    string bruker_navn
     string epost
     }
     BRUKER ||--o{ LÆRER : ""
     BRUKER ||--o{ ELEV : ""
 
 KLASSEROM {
-    string kode
-    string navn
+    int rom_id(pk)
+    string rom_kode
+    string rom_navn
 }
     ELEV }o--o{ GRUPPE : "medlem"
-    GRUPPE ||--o{ KLASSEROM :"tildeles"
+    GRUPPE ||--o{ KLASSEROM :"nøkkel"
 
 GRUPPE {
-    string nøkkel
+    int gruppe_id(pk)
+    int bruker_id
 }
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--o{ GRUPPE : "medlem"
     KLASSEROM ||--o{ BESKJED : "sjekk"
     KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
+
 INNLEGG {
-    string avsender
+    int innleggs_id(pk)
+    int bruker_navn(fk)
     string dato
     string overskrift
     string innhold
 }
 SVARINNLEGG {
-    string avsender
+    int innleggs_id(pk)
+    string bruker_navn(fk)
     string dato
     string overskrift
     string innhold
