@@ -27,7 +27,18 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 
 **Oppgave:** Beskriv en konseptuell datamodell (med tekst eller ER-diagram) for systemet. Modellen skal kun inneholde entiteter, som du har valgt, og forholdene mellom dem, med kardinalitet. Du trenger ikke spesifisere attributter i denne delen.
 
-**Ditt svar:***
+```mermaid
+erDiagram
+    BRUKER ||--o{ LÆRER : er
+    BRUKER ||--o{ ELEV : er
+    BRUKER ||--o{ LOGGINN : "logger inn via"
+    LÆRER ||--o{ KLASSEROM : "oppretter"
+    ELEV }o--o{ KLASSEROM : "deltar i"
+    KLASSEROM ||--o{ BESKJED : "har"
+    KLASSEROM ||--o{ DISKUSJONSFORUM : "har"
+    DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
+    INNLEGG ||--o{ SVARINNLEGG : "har"
+``` 
 
 
 ## Del 2: Logisk Skjema (Tabellstruktur)
