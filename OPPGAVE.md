@@ -45,8 +45,48 @@ erDiagram
 
 **Oppgave:** Oversett den konseptuelle modellen til en logisk tabellstruktur. Spesifiser tabellnavn, attributter (kolonner), datatyper, primærnøkler (PK) og fremmednøkler (FK). Tegn et utvidet ER-diagram med [mermaid.live](https://mermaid.live/) eller eventuelt på papir.
 
+```mermaid
+erDiagram
+BRUKER {
+    string brukernavn
+    string epost
+    }
+    BRUKER ||--o{ LÆRER : ""
+    BRUKER ||--o{ ELEV : ""
 
-**Ditt svar:***
+KLASSEROM {
+    string kode
+    string navn
+}
+    ELEV }o--o{ GRUPPE : "medlem"
+    GRUPPE ||--o{ KLASSEROM :"tildeles"
+
+GRUPPE {
+    string nøkkel
+}
+    LÆRER ||--o{ KLASSEROM : "oppretter"
+    LÆRER ||--o{ GRUPPE : "medlem"
+    KLASSEROM ||--o{ BESKJED : "sjekk"
+    KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
+    DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
+INNLEGG {
+    string avsender
+    string dato
+    string overskrift
+    string innhold
+}
+SVARINNLEGG {
+    string avsender
+    string dato
+    string overskrift
+    string innhold
+}
+    INNLEGG ||--o{ SVARINNLEGG : har
+    SVARINNLEGG ||--o{ SVARINNLEGG : svar_på
+
+    INNLEGG ||--o{ SVARINNLEGG : har
+    SVARINNLEGG ||--o{ SVARINNLEGG : svar_på
+```
 
 
 ## Del 3: Datadefinisjon (DDL) og Mock-Data
