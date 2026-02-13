@@ -32,13 +32,13 @@ erDiagram
     BRUKER ||--o{ LÆRER : er
     BRUKER ||--o{ ELEV : er
     ELEV }o--o{ GRUPPE_ELEV : medlem
+    GRUPPE ||--o{ KLASSEROM : tilhører
+    LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--O{ GRUPPE : styrer
-    GRUPPE ||--o{ KLASSEROM : "oppretter"
-    GRUPPE_ELEV }o--o{ KLASSEROM : "deltar i"
-    KLASSEROM ||--o{ BESKJED : "har"
-    KLASSEROM ||--o{ DISKUSJONSFORUM : "har"
-    DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
-    INNLEGG ||--o{ INNLEGG : "har"
+    KLASSEROM ||--o{ BESKJED : har
+    KLASSEROM ||--o{ DISKUSJONSFORUM : har
+    DISKUSJONSFORUM ||--o{ INNLEGG : inneholder
+    INNLEGG ||--o{ INNLEGG : har
 ``` 
 
 
@@ -49,44 +49,46 @@ erDiagram
 ```mermaid
 erDiagram
 BRUKER {
-    int bruker_id(pk)
-    string bruker_navn
+    int bruker_id PK
+    string bruker_type
     string epost
     }
-    BRUKER ||--o{ LÆRER : ""
-    BRUKER ||--o{ ELEV : ""
+    BRUKER ||--o{ LÆRER : "er"
+    BRUKER ||--o{ ELEV : "er"
 ELEV {
-    int bruker_id(fk)
+    int bruker_id PK
 }
 LÆRER {
-    int bruker_id(fk)
+    int bruker_id PK
 }
 KLASSEROM {
-    int rom_id(pk)
+    int rom_id PK
     string rom_kode
+    int lærer_id FK
     string rom_navn
-}
-    ELEV }o--o{ GRUPPE_ELEV : "medlem"
-    GRUPPE ||--o{ KLASSEROM :"nøkkel"
-    GRUPPE_ELEV }o--||KLASSEROM :"jobber i"
-
-GRUPPE_ELEV {
-    int bruker_id(fk)
-    int gruppe_id(fk)
+    string nøkkel
 }
 GRUPPE {
-    int gruppe_id(pk)
-    int gruppe_id
+    int gruppe_id PK
+    string gruppe_navn
+    int rom_id FK
 }
-    GRUPPE ||--o{ GRUPPE_ELEV: ""
+ELEV_TIL_GRUPPE {
+    int bruker_id FK
+    int gruppe_id FK
+}
+    ELEV }o--o{ ELEV_TIL_GRUPPE : "medlem"
+    GRUPPE }o--|| KLASSEROM : "tilhører"
     LÆRER ||--o{ KLASSEROM : "oppretter"
-    LÆRER ||--o{ GRUPPE : "medlem"
+    LÆRER ||--o{ GRUPPE : "styrer"
     KLASSEROM ||--o{ BESKJED : "sjekk"
     KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
 INNLEGG {
-    int innleggs_id(pk)
-    int bruker_id(fk)
+    int innleggs_id PK
+    int opprinnelig_innlegg FK
+    string innleggs_type
+    int bruker_id FK
     string overskrift
     string innhold
     timestamp dato
@@ -100,17 +102,14 @@ INNLEGG {
 **Oppgave:** Skriv SQL-setninger for å opprette tabellstrukturen (DDL - Data Definition Language) og sett inn realistiske mock-data for å simulere bruk av systemet.
 
 
-CREATE TABLE brukere (bruker_id SERIAL PRIMARY KEY, bruker_navn VARCHAR(50), epost VARCHAR(100));
-CREATE TABLE gruppe (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50));
+CREATE TABLE brukere (bruker_id SERIAL PRIMARY KEY, bruker_type VARCHAR(50), epost VARCHAR(100));
 CREATE TABLE elever (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
-CREATE TABLE elev_gruppe (elev_id INTEGER REFERENCES brukere(bruker_id), gruppe_id INTEGER REFERENCES gruppe(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
 CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
-CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), rom_navn varchar(50));
-CREATE TABLE beskjeder (beskjed_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), dato TIMESTAMP);
-CREATE TABLE diskusjonsforum (forum_id SERIAL PRIMARY KEY, forum_navn VARCHAR(50));
-CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(400), dato TIMESTAMP);
-CREATE TABLE svarinnlegg (svar_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(300),
-    svar_til_innlegg INTEGER REFERENCES innlegg(innleggs_id), svar_til_svar INTEGER REFERENCES svarinnlegg(svar_id), dato TIMESTAMP);
+CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), lærer_id INTEGER REFERENCES lærere(bruker_id), rom_navn varchar(50), nøkkel varchar(50));
+CREATE TABLE grupper (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id));
+CREATE TABLE elev_til_gruppe (elev_id INTEGER REFERENCES elever(bruker_id), gruppe_id INTEGER REFERENCES grupper(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
+CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGER REFERENCES innlegg(innleggs_id), innleggs_type VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id), avsender INTEGER REFERENCES brukere(bruker_id), overskrift VARCHAR(50), innhold VARCHAR(400), dato TIMESTAMP);
+
 
 
 
@@ -121,11 +120,11 @@ CREATE TABLE svarinnlegg (svar_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCE
 ### 1. Finn de 3 nyeste beskjeder fra læreren i et gitt klasserom (f.eks. klasserom_id = 1).
 
 *   **Relasjonsalgebra:**
-    > 
+    >  avsender = lærer ∧ klasserom_id = 1
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT * FROM innlegg WHERE avsender IN (SELECT bruker_id FROM lærere) AND rom_id = 1 ORDER BY dato DESC LIMIT 3;
     ```
 
 ### 2. Vis en hel diskusjonstråd startet av en spesifikk student (f.eks. avsender_id = 2).
