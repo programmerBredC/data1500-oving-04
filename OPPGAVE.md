@@ -70,7 +70,8 @@ KLASSEROM {
     GRUPPE_ELEV ||--o{ KLASSEROM :"nøkkel"
 
 GRUPPE_ELEV {
-    string bruker_navn(fk)
+    int bruker_id(fk)
+    int gruppe_id(fk)
 }
 GRUPPE {
     int gruppe_id(pk)
@@ -84,7 +85,7 @@ GRUPPE {
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
 INNLEGG {
     int innleggs_id(pk)
-    string bruker_id(fk)
+    int bruker_id(fk)
     string overskrift
     string innhold
     timestamp dato
