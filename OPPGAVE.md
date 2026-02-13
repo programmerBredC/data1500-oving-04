@@ -82,26 +82,14 @@ GRUPPE {
     KLASSEROM ||--o{ BESKJED : "sjekk"
     KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
-
 INNLEGG {
     int innleggs_id(pk)
-    int bruker_navn(fk)
-    string dato
+    string bruker_id(fk)
     string overskrift
     string innhold
+    timestamp dato
 }
-SVARINNLEGG {
-    int innleggs_id(pk)
-    string bruker_navn(fk)
-    string dato
-    string overskrift
-    string innhold
-}
-    INNLEGG ||--o{ SVARINNLEGG : har
-    SVARINNLEGG ||--o{ SVARINNLEGG : svar_på
-
-    INNLEGG ||--o{ SVARINNLEGG : har
-    SVARINNLEGG ||--o{ SVARINNLEGG : svar_på
+    INNLEGG ||--o{ INNLEGG : har
 ```
 
 
@@ -116,11 +104,11 @@ CREATE TABLE elever (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY
 CREATE TABLE elev_gruppe (elev_id INTEGER REFERENCES brukere(bruker_id), gruppe_id INTEGER REFERENCES gruppe(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
 CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
 CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), rom_navn varchar(50));
-CREATE TABLE beskjeder (beskjed_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id));
+CREATE TABLE beskjeder (beskjed_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), dato TIMESTAMP);
 CREATE TABLE diskusjonsforum (forum_id SERIAL PRIMARY KEY, forum_navn VARCHAR(50));
-CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(400));
+CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(400), dato TIMESTAMP);
 CREATE TABLE svarinnlegg (svar_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(300),
-    svar_til_innlegg INTEGER REFERENCES innlegg(innleggs_id), svar_til_svar INTEGER REFERENCES svarinnlegg(svar_id));
+    svar_til_innlegg INTEGER REFERENCES innlegg(innleggs_id), svar_til_svar INTEGER REFERENCES svarinnlegg(svar_id), dato TIMESTAMP);
 
 
 
