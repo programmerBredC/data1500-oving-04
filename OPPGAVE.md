@@ -60,13 +60,17 @@ KLASSEROM {
     string rom_kode
     string rom_navn
 }
-    ELEV }o--o{ GRUPPE : "medlem"
-    GRUPPE ||--o{ KLASSEROM :"nøkkel"
+    ELEV }o--o{ GRUPPE_ELEV : "medlem"
+    GRUPPE_ELEV ||--o{ KLASSEROM :"nøkkel"
 
+GRUPPE_ELEV {
+    string bruker_navn(fk)
+}
 GRUPPE {
     int gruppe_id(pk)
-    int bruker_id
+    int gruppe_navn
 }
+    GRUPPE ||--o{ GRUPPE_ELEV: ""
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--o{ GRUPPE : "medlem"
     KLASSEROM ||--o{ BESKJED : "sjekk"
@@ -100,7 +104,18 @@ SVARINNLEGG {
 **Oppgave:** Skriv SQL-setninger for å opprette tabellstrukturen (DDL - Data Definition Language) og sett inn realistiske mock-data for å simulere bruk av systemet.
 
 
-**Ditt svar:***
+CREATE TABLE brukere (bruker_id SERIAL PRIMARY KEY, bruker_navn VARCHAR(50), epost VARCHAR(100));
+CREATE TABLE gruppe (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50));
+CREATE TABLE elever (elev_id SERIAL PRIMARY KEY, elev_navn VARCHAR(50))
+CREATE TABLE elev_gruppe (elev_id INTEGER, gruppe_id INTEGER REFERENCES gruppe(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
+CREATE TABLE lærere (lærer_id SERIAL PRIMARY KEY, lærer_navn VARCHAR(50), gruppe_id_1 INTEGER)
+CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), rom_navn varchar(50));
+CREATE TABLE beskjeder (beskjed_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id));
+CREATE TABLE diskusjonsforum (forum_id SERIAL PRIMARY KEY, forum_navn VARCHAR(50));
+CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(400));
+CREATE TABLE svarinnlegg (svar_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id), innhold VARCHAR(300),
+    svar_til_innlegg INTEGER REFERENCES innlegg(innleggs_id), svar_til_svar INTEGER REFERENCES svarinnlegg(svar_id));
+
 
 
 ## Del 4: Spørringer mot Databasen
