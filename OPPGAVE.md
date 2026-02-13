@@ -38,7 +38,7 @@ erDiagram
     KLASSEROM ||--o{ BESKJED : "har"
     KLASSEROM ||--o{ DISKUSJONSFORUM : "har"
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
-    INNLEGG ||--o{ SVARINNLEGG : "har"
+    INNLEGG ||--o{ INNLEGG : "har"
 ``` 
 
 
