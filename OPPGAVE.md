@@ -31,7 +31,7 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 erDiagram
     BRUKER ||--o{ LÆRER : er
     BRUKER ||--o{ ELEV : er
-    ELEV }o--o{ GRUPPE_ELEV : medlem
+    ELEV }o--o{ ELEV_I_GRUPPE : medlem
     GRUPPE ||--o{ KLASSEROM : tilhører
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--O{ GRUPPE : styrer
@@ -73,11 +73,11 @@ GRUPPE {
     string gruppe_navn
     int rom_id FK
 }
-ELEV_TIL_GRUPPE {
+ELEV_I_GRUPPE {
     int bruker_id FK
     int gruppe_id FK
 }
-    ELEV }o--o{ ELEV_TIL_GRUPPE : "medlem"
+    ELEV }o--o{ ELEV_I_GRUPPE : "medlem"
     GRUPPE }o--|| KLASSEROM : "tilhører"
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--o{ GRUPPE : "styrer"
@@ -107,7 +107,7 @@ CREATE TABLE elever (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY
 CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
 CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), lærer_id INTEGER REFERENCES lærere(bruker_id), rom_navn varchar(50), nøkkel varchar(50));
 CREATE TABLE grupper (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id));
-CREATE TABLE elev_til_gruppe (elev_id INTEGER REFERENCES elever(bruker_id), gruppe_id INTEGER REFERENCES grupper(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
+CREATE TABLE elev_i_gruppe (elev_id INTEGER REFERENCES elever(bruker_id), gruppe_id INTEGER REFERENCES grupper(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
 CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGER REFERENCES innlegg(innleggs_id), innleggs_type VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id), avsender INTEGER REFERENCES brukere(bruker_id), overskrift VARCHAR(50), innhold VARCHAR(400), dato TIMESTAMP);
 
 
