@@ -67,7 +67,8 @@ KLASSEROM {
     string rom_navn
 }
     ELEV }o--o{ GRUPPE_ELEV : "medlem"
-    GRUPPE_ELEV ||--o{ KLASSEROM :"nøkkel"
+    GRUPPE ||--o{ KLASSEROM :"nøkkel"
+    GRUPPE_ELEV }o--||KLASSEROM :"jobber i"
 
 GRUPPE_ELEV {
     int bruker_id(fk)
@@ -75,7 +76,7 @@ GRUPPE_ELEV {
 }
 GRUPPE {
     int gruppe_id(pk)
-    int gruppe_navn
+    int gruppe_id
 }
     GRUPPE ||--o{ GRUPPE_ELEV: ""
     LÆRER ||--o{ KLASSEROM : "oppretter"
