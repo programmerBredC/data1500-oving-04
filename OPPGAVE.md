@@ -31,9 +31,10 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 erDiagram
     BRUKER ||--o{ LÆRER : er
     BRUKER ||--o{ ELEV : er
-    BRUKER ||--o{ LOGGINN : "logger inn via"
-    LÆRER ||--o{ KLASSEROM : "oppretter"
-    ELEV }o--o{ KLASSEROM : "deltar i"
+    ELEV }o--o{ GRUPPE_ELEV : medlem
+    LÆRER ||--O{ GRUPPE : styrer
+    GRUPPE ||--o{ KLASSEROM : "oppretter"
+    GRUPPE_ELEV }o--o{ KLASSEROM : "deltar i"
     KLASSEROM ||--o{ BESKJED : "har"
     KLASSEROM ||--o{ DISKUSJONSFORUM : "har"
     DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
