@@ -55,7 +55,12 @@ BRUKER {
     }
     BRUKER ||--o{ LÆRER : ""
     BRUKER ||--o{ ELEV : ""
-
+ELEV {
+    int bruker_id(fk)
+}
+LÆRER {
+    int bruker_id(fk)
+}
 KLASSEROM {
     int rom_id(pk)
     string rom_kode
@@ -109,7 +114,7 @@ CREATE TABLE brukere (bruker_id SERIAL PRIMARY KEY, bruker_navn VARCHAR(50), epo
 CREATE TABLE gruppe (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50));
 CREATE TABLE elever (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
 CREATE TABLE elev_gruppe (elev_id INTEGER REFERENCES brukere(bruker_id), gruppe_id INTEGER REFERENCES gruppe(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
-CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY, gruppe_id_1 INTEGER);
+CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
 CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), rom_navn varchar(50));
 CREATE TABLE beskjeder (beskjed_id SERIAL PRIMARY KEY, avsender INTEGER REFERENCES brukere(bruker_id));
 CREATE TABLE diskusjonsforum (forum_id SERIAL PRIMARY KEY, forum_navn VARCHAR(50));
