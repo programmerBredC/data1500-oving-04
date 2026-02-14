@@ -35,9 +35,7 @@ erDiagram
     GRUPPE ||--o{ KLASSEROM : tilhører
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--O{ GRUPPE : styrer
-    KLASSEROM ||--o{ BESKJED : har
-    KLASSEROM ||--o{ DISKUSJONSFORUM : har
-    DISKUSJONSFORUM ||--o{ INNLEGG : inneholder
+    KLASSEROM ||--o{ INNLEGG : inneholder
     INNLEGG ||--o{ INNLEGG : har
 ``` 
 
@@ -81,9 +79,7 @@ ELEV_I_GRUPPE {
     GRUPPE }o--|| KLASSEROM : "tilhører"
     LÆRER ||--o{ KLASSEROM : "oppretter"
     LÆRER ||--o{ GRUPPE : "styrer"
-    KLASSEROM ||--o{ BESKJED : "sjekk"
-    KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
-    DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
+    KLASSEROM ||--o{ INNLEGG : "inneholder"
 INNLEGG {
     int innleggs_id PK
     int opprinnelig_innlegg FK
