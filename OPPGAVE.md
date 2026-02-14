@@ -120,7 +120,7 @@ CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGE
 ### 1. Finn de 3 nyeste beskjeder fra læreren i et gitt klasserom (f.eks. klasserom_id = 1).
 
 *   **Relasjonsalgebra:**
-    >  avsender = lærer ∧ klasserom_id = 1
+    >  σ lærer ∧ klasserom_id = 1 (innlegg)
 
 *   **SQL:**
     ```
@@ -155,11 +155,11 @@ SELECT * FROM traad;
 ### 3. Finn alle studenter i en spesifikk gruppe (f.eks. gruppe_id = 1).
 
 *   **Relasjonsalgebra:**
-    > 
+    > σ gruppe_id = 1 (elev_i_gruppe)
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT * FROM elev_i_gruppe WHERE gruppe_id = 1
     ```
 
 ### 4. Finn antall grupper.
