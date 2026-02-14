@@ -27,15 +27,74 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 
 **Oppgave:** Beskriv en konseptuell datamodell (med tekst eller ER-diagram) for systemet. Modellen skal kun inneholde entiteter, som du har valgt, og forholdene mellom dem, med kardinalitet. Du trenger ikke spesifisere attributter i denne delen.
 
-**Ditt svar:***
+```mermaid
+erDiagram
+    BRUKER ||--o{ LÆRER : er
+    BRUKER ||--o{ ELEV : er
+    ELEV }o--o{ ELEV_I_GRUPPE : medlem
+    GRUPPE ||--o{ KLASSEROM : tilhører
+    LÆRER ||--o{ KLASSEROM : "oppretter"
+    LÆRER ||--O{ GRUPPE : styrer
+    KLASSEROM ||--o{ BESKJED : har
+    KLASSEROM ||--o{ DISKUSJONSFORUM : har
+    DISKUSJONSFORUM ||--o{ INNLEGG : inneholder
+    INNLEGG ||--o{ INNLEGG : har
+``` 
 
 
 ## Del 2: Logisk Skjema (Tabellstruktur)
 
 **Oppgave:** Oversett den konseptuelle modellen til en logisk tabellstruktur. Spesifiser tabellnavn, attributter (kolonner), datatyper, primærnøkler (PK) og fremmednøkler (FK). Tegn et utvidet ER-diagram med [mermaid.live](https://mermaid.live/) eller eventuelt på papir.
 
-
-**Ditt svar:***
+```mermaid
+erDiagram
+BRUKER {
+    int bruker_id PK
+    string bruker_type
+    string epost
+    }
+    BRUKER ||--o{ LÆRER : "er"
+    BRUKER ||--o{ ELEV : "er"
+ELEV {
+    int bruker_id PK
+}
+LÆRER {
+    int bruker_id PK
+}
+KLASSEROM {
+    int rom_id PK
+    string rom_kode
+    int lærer_id FK
+    string rom_navn
+    string nøkkel
+}
+GRUPPE {
+    int gruppe_id PK
+    string gruppe_navn
+    int rom_id FK
+}
+ELEV_I_GRUPPE {
+    int bruker_id FK
+    int gruppe_id FK
+}
+    ELEV }o--o{ ELEV_I_GRUPPE : "medlem"
+    GRUPPE }o--|| KLASSEROM : "tilhører"
+    LÆRER ||--o{ KLASSEROM : "oppretter"
+    LÆRER ||--o{ GRUPPE : "styrer"
+    KLASSEROM ||--o{ BESKJED : "sjekk"
+    KLASSEROM ||--o{ DISKUSJONSFORUM : "se"
+    DISKUSJONSFORUM ||--o{ INNLEGG : "inneholder"
+INNLEGG {
+    int innleggs_id PK
+    int opprinnelig_innlegg FK
+    string innleggs_type
+    int bruker_id FK
+    string overskrift
+    string innhold
+    timestamp dato
+}
+    INNLEGG ||--o{ INNLEGG : har
+```
 
 
 ## Del 3: Datadefinisjon (DDL) og Mock-Data
@@ -43,7 +102,15 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 **Oppgave:** Skriv SQL-setninger for å opprette tabellstrukturen (DDL - Data Definition Language) og sett inn realistiske mock-data for å simulere bruk av systemet.
 
 
-**Ditt svar:***
+CREATE TABLE brukere (bruker_id SERIAL PRIMARY KEY, bruker_type VARCHAR(50), epost VARCHAR(100));
+CREATE TABLE elever (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
+CREATE TABLE lærere (bruker_id INTEGER REFERENCES brukere(bruker_id) PRIMARY KEY);
+CREATE TABLE klasserom (rom_id SERIAL PRIMARY KEY, rom_kode VARCHAR(50), lærer_id INTEGER REFERENCES lærere(bruker_id), rom_navn varchar(50), nøkkel varchar(50));
+CREATE TABLE grupper (gruppe_id SERIAL PRIMARY KEY, gruppe_navn VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id));
+CREATE TABLE elev_i_gruppe (elev_id INTEGER REFERENCES elever(bruker_id), gruppe_id INTEGER REFERENCES grupper(gruppe_id), PRIMARY KEY (elev_id, gruppe_id));
+CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGER REFERENCES innlegg(innleggs_id), innleggs_type VARCHAR(50), rom_id INTEGER REFERENCES klasserom(rom_id), avsender INTEGER REFERENCES brukere(bruker_id), overskrift VARCHAR(50), innhold VARCHAR(400), dato TIMESTAMP);
+
+
 
 
 ## Del 4: Spørringer mot Databasen
@@ -53,11 +120,14 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 ### 1. Finn de 3 nyeste beskjeder fra læreren i et gitt klasserom (f.eks. klasserom_id = 1).
 
 *   **Relasjonsalgebra:**
-    > 
+    >  σ lærer ∧ klasserom_id = 1 (innlegg)
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT * FROM innlegg WHERE avsender IN (
+        SELECT bruker_id FROM lærere
+        )
+    AND rom_id = 1 ORDER BY dato DESC LIMIT 3;
     ```
 
 ### 2. Vis en hel diskusjonstråd startet av en spesifikk student (f.eks. avsender_id = 2).
@@ -67,29 +137,39 @@ I et klasserom kan studentene lese beskjeder fra læreren. Hvert klasserom har o
 
 *   **SQL (med `WITH RECURSIVE`):**
 
-    Du kan vente med denne oppgaven til vi har gått gjennom avanserte SQL-spørringer (tips: må bruke en rekursiv konstruksjon `WITH RECURSIVE diskusjonstraad AS (..) SELECT FROM diskusjonstraad ...`)
-    ```sql
-    
+    ```
+WITH RECURSIVE traad AS (
+  SELECT * 
+  FROM innlegg
+  WHERE avsender = 2 AND opprinnelig_innlegg IS NULL
+
+  UNION ALL
+
+  SELECT i.*
+  FROM innlegg i
+  JOIN traad t ON i.opprinnelig_innlegg = t.innleggs_id
+)
+SELECT * FROM traad;   
     ```
 
 ### 3. Finn alle studenter i en spesifikk gruppe (f.eks. gruppe_id = 1).
 
 *   **Relasjonsalgebra:**
-    > 
+    > σ gruppe_id = 1 (elev_i_gruppe)
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT * FROM elev_i_gruppe WHERE gruppe_id = 1
     ```
 
 ### 4. Finn antall grupper.
 
 *   **Relasjonsalgebra (med aggregering):**
-    > 
+    >  COUNT gruppe_id (grupper)
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT COUNT(gruppe_id) FROM grupper;
     ```
 
 ## Del 5: Implementer i postgreSQL i din Docker container
