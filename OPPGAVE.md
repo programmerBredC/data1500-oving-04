@@ -124,7 +124,10 @@ CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGE
 
 *   **SQL:**
     ```
-    SELECT * FROM innlegg WHERE avsender IN (SELECT bruker_id FROM lærere) AND rom_id = 1 ORDER BY dato DESC LIMIT 3;
+    SELECT * FROM innlegg WHERE avsender IN (
+        SELECT bruker_id FROM lærere
+        )
+    AND rom_id = 1 ORDER BY dato DESC LIMIT 3;
     ```
 
 ### 2. Vis en hel diskusjonstråd startet av en spesifikk student (f.eks. avsender_id = 2).
@@ -134,9 +137,19 @@ CREATE TABLE innlegg (innleggs_id SERIAL PRIMARY KEY, opprinnelig_innlegg INTEGE
 
 *   **SQL (med `WITH RECURSIVE`):**
 
-    Du kan vente med denne oppgaven til vi har gått gjennom avanserte SQL-spørringer (tips: må bruke en rekursiv konstruksjon `WITH RECURSIVE diskusjonstraad AS (..) SELECT FROM diskusjonstraad ...`)
-    ```sql
-    
+    ```
+WITH RECURSIVE traad AS (
+  SELECT * 
+  FROM innlegg
+  WHERE avsender = 2 AND opprinnelig_innlegg IS NULL
+
+  UNION ALL
+
+  SELECT i.*
+  FROM innlegg i
+  JOIN traad t ON i.opprinnelig_innlegg = t.innleggs_id
+)
+SELECT * FROM traad;   
     ```
 
 ### 3. Finn alle studenter i en spesifikk gruppe (f.eks. gruppe_id = 1).
