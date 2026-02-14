@@ -165,11 +165,11 @@ SELECT * FROM traad;
 ### 4. Finn antall grupper.
 
 *   **Relasjonsalgebra (med aggregering):**
-    > 
+    >  COUNT gruppe_id (grupper)
 
 *   **SQL:**
-    ```sql
-    
+    ```
+    SELECT COUNT(gruppe_id) FROM grupper;
     ```
 
 ## Del 5: Implementer i postgreSQL i din Docker container
